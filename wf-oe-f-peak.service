@@ -1,0 +1,18 @@
+[Unit]
+Description=Workflow OE-F_PEAK Service
+Documentation=https://github.com/pithia-eu/WF-OE-F-PEAK/blob/main/README.md
+
+[Service]
+Type=simple
+User=root
+Group=root
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=30s
+#ExecStartPre=
+ExecStart=/home/ubuntu/WF-OE-F-PEAK/start_oe_f_peak.sh
+SyslogIdentifier=Diskutilization
+#ExecStop=
+
+[Install]
+WantedBy=multi-user.target
