@@ -188,7 +188,7 @@ async def run_workflow(start_datetime: str = Query(...,
                            ..., description="Select number of days (1 to 10). Default is 1 day."
                        ),
                        station: ValidStation = Query(...,
-                                                                description="Comma-separated list of stations. Valid stations are: " + SORTED_VALID_STATIONS),
+                                                                description="List of stations."),
                        ):
     # convert n_days to int
     n_days = int(n_days)
@@ -325,7 +325,7 @@ async def plot_data(start_datetime: str = Query(...,
                            ..., description="Select number of days (1 to 10). Default is 1 day."
                        ),
                        station: ValidStation = Query(...,
-                                                                description="Comma-separated list of stations. Valid stations are: " + SORTED_VALID_STATIONS),
+                                                                description="List of stations."),
                        ):
     # convert n_days to int
     n_days = int(n_days)
