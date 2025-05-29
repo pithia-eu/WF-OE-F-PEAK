@@ -30,15 +30,15 @@ app = FastAPI(
     openapi_tags=[
         {
             "name": "Run Workflow",
-            "description": "Run the OE-F-PEAK workflow"
+            "description": "Run the Ionospheric Peak Height Anomaly Monitor Workflow"
         },
         {
             "name": "Plot Data",
-            "description": "Plot the data from the OE-F-PEAK workflow"
+            "description": "Plot the data from the Ionospheric Peak Height Anomaly Monitor Workflow"
         }
     ],
-    title="OE-F-PEAK Workflow API",
-    description="This API provides endpoints to run the OE-F-PEAK workflow, which retrieves ionospheric data and plots it.",
+    title="Ionospheric Peak Height Anomaly Monitor Workflow API",
+    description="This workflow provides measured F2 peak height (FPeak) values obtained from GIRO ionosonde stations and compares them with modelled FPeak values in quiet conditions derived from a data collection developed by the Ebro Observatory. <br/><br/>The comparison is performed over a user-defined time interval, with plots showing the residuals (differences) between the observed and modelled FPeak values.<br/><br/>These residuals are displayed together with magnetic field components from the DSCOVR mission and the three-hourly geomagnetic Kp-index as possible drivers. <br/><br/>The workflow enables users to explore potential correlations between FPeak residuals and geomagnetic or interplanetary indices.",
     version="1.0.0",
     root_path="/wf-oe-f-peak"
 )
@@ -175,21 +175,11 @@ def get_f_peak_data(year, month, day, n_days, latitude, longitude):
         print(f"Error: {e}")
         return None
 
-# Get the status of the NOA Workflow API
-@app.get("/", summary="Get the status of the SWIMAGD_IONO Workflow API.", description="Returns the status of the SWIMAGD_IONO Workflow API.", tags=["Status"], include_in_schema=False)
-async def get_status():
-    return {"status": "ok",
-            "message": "The SWIMAGD_IONO Workflow API is running.",
-            "version": "1.0.0",
-            "api_dir": script_dir,
-            "workflow_dir": workflow_dir}
-
-
 @app.get("/run_workflow/", response_class=StreamingResponse, responses={
     200: {"content": {"application/octet-stream": {}},
           "description": "**Important:** When selecting the 'zip' format, please remember to rename the downloaded file to have the extension '*.zip' before opening it.\n\n", }},
-         summary="Run the OE-F-PEAK workflow.",
-         description="Return the results of the OE-F-PEAK workflow as a json object.",
+         summary="Run the workflow.",
+         description="Return the results of the Ionospheric Peak Height Anomaly Monitor Workflow as a json object.",
          tags=["Run Workflow"])
 async def run_workflow(start_datetime: str = Query(...,
                                                    description="Datetime in the format 'YYYY-MM-DD', e.g. 2024-01-01"),
@@ -325,8 +315,8 @@ async def run_workflow(start_datetime: str = Query(...,
 
 
 @app.get("/plot_data/", response_class=StreamingResponse,
-         summary="Plot the data from the OE-F-PEAK workflow.",
-         description="Plot the data from the OE-F-PEAK workflow and return the plot as a PNG image.",
+         summary="Plot the data from the workflow.",
+         description="Plot the data from the Ionospheric Peak Height Anomaly Monitor Workflow and return the plot as a PNG image.",
          tags=["Plot Data"])
 async def plot_data(start_datetime: str = Query(...,
                                                    description="Datetime in the format 'YYYY-MM-DD', e.g. 2024-01-01"),
