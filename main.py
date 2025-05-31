@@ -291,6 +291,16 @@ async def run_workflow(start_datetime: str = Query(...,
                 "hmF2": ic_json[timestamp]['hmF2'],
                 "difference": diff
             }
+        else:
+            # If the timestamp is not in ic_json, find the closest timestamp in ic_json
+            closest_timestamp = min(ic_json.keys(), key=lambda x: abs(datetime.fromisoformat(x) - datetime.fromisoformat(timestamp)))
+            diff = ic_json[closest_timestamp]['hmF2'] - f_peak_json[timestamp]['fpeak_height']
+            diff = round(diff, 2)
+            diff_json[timestamp] = {
+                "fpeak_height": f_peak_json[timestamp]['fpeak_height'],
+                "hmF2": ic_json[closest_timestamp]['hmF2'],
+                "difference": diff
+            }
     output = {
         "ic_data": ic_json,
         "f_peak_data": f_peak_json,
@@ -428,6 +438,17 @@ async def plot_data(start_datetime: str = Query(...,
                 "hmF2": ic_json[timestamp]['hmF2'],
                 "difference": diff
             }
+        else:
+            # If the timestamp is not in ic_json, find the closest timestamp in ic_json
+            closest_timestamp = min(ic_json.keys(), key=lambda x: abs(datetime.fromisoformat(x) - datetime.fromisoformat(timestamp)))
+            diff = ic_json[closest_timestamp]['hmF2'] - f_peak_json[timestamp]['fpeak_height']
+            diff = round(diff, 2)
+            diff_json[timestamp] = {
+                "fpeak_height": f_peak_json[timestamp]['fpeak_height'],
+                "hmF2": ic_json[closest_timestamp]['hmF2'],
+                "difference": diff
+            }
+            # print(f"Timestamp {timestamp} not found in ic_json, using closest timestamp {closest_timestamp} instead.")
     output = {
         "ic_data": ic_json,
         "f_peak_data": f_peak_json,
@@ -503,9 +524,10 @@ async def plot_data(start_datetime: str = Query(...,
     max_fpeak_y_axis = max(fpeak_y_axis, key=abs)
     # Convert the max_fpeak_y_axis to int
     max_fpeak_y_axis = int(max_fpeak_y_axis)
+    # Use abs to get the absolute value of max_fpeak_y_axis
+    max_fpeak_y_axis = abs(max_fpeak_y_axis)
     # Set the y-axis range from min to max of fpeak_y_axis offset by 20% of the axis height, auto scale
     ax_ic_diff_fpeak.set_ylim(-1.2*max_fpeak_y_axis, 1.2*max_fpeak_y_axis)
-    ax_ic_diff_fpeak.invert_yaxis()  # Invert the y-axis
     # Set the major ticks, maximum 5 ticks
     ax_ic_diff_fpeak.yaxis.set_major_locator(MaxNLocator(nbins=5, integer=True))
     # Draw the horizontal line at each major tick position
