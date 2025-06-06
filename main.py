@@ -294,6 +294,12 @@ async def run_workflow(start_datetime: str = Query(...,
         else:
             # If the timestamp is not in ic_json, find the closest timestamp in ic_json
             closest_timestamp = min(ic_json.keys(), key=lambda x: abs(datetime.fromisoformat(x) - datetime.fromisoformat(timestamp)))
+            # Ensure the closest timestamp is within the range of the f_peak_json timestamps,  a time window of 25 minutes before and after
+            closest_time = datetime.fromisoformat(closest_timestamp)
+            f_peak_time = datetime.fromisoformat(timestamp)
+            if not (f_peak_time - timedelta(minutes=25) <= closest_time <= f_peak_time + timedelta(minutes=25)):
+                # If the closest timestamp is not within the time window, skip this timestamp
+                continue
             diff = ic_json[closest_timestamp]['hmF2'] - f_peak_json[timestamp]['fpeak_height']
             diff = round(diff, 2)
             diff_json[timestamp] = {
@@ -441,6 +447,12 @@ async def plot_data(start_datetime: str = Query(...,
         else:
             # If the timestamp is not in ic_json, find the closest timestamp in ic_json
             closest_timestamp = min(ic_json.keys(), key=lambda x: abs(datetime.fromisoformat(x) - datetime.fromisoformat(timestamp)))
+            # Ensure the closest timestamp is within the range of the f_peak_json timestamps, a time window of 25 minutes before and after
+            closest_time = datetime.fromisoformat(closest_timestamp)
+            f_peak_time = datetime.fromisoformat(timestamp)
+            if not (f_peak_time - timedelta(minutes=25) <= closest_time <= f_peak_time + timedelta(minutes=25)):
+                # If the closest timestamp is not within the time window, skip this timestamp
+                continue
             diff = ic_json[closest_timestamp]['hmF2'] - f_peak_json[timestamp]['fpeak_height']
             diff = round(diff, 2)
             diff_json[timestamp] = {
@@ -520,6 +532,7 @@ async def plot_data(start_datetime: str = Query(...,
     fpeak_y_axis = [diff_json[t]["difference"] for t in diff_json]
     ax_ic_diff_fpeak.plot(fpeak_x_axis, fpeak_y_axis, color='green', label='Difference (hmF2 - fpeak)')
     ax_ic_diff_fpeak.fill_between(fpeak_x_axis, fpeak_y_axis, 0, color='green', alpha=0.2)
+    ax_ic_diff_fpeak.scatter(fpeak_x_axis, fpeak_y_axis, color='green', marker='s', s=20, label='Difference points')
     # Get the max of absolute value of fpeak_y_axis
     max_fpeak_y_axis = max(fpeak_y_axis, key=abs)
     # Convert the max_fpeak_y_axis to int
